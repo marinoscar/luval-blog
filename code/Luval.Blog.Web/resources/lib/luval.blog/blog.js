@@ -1,0 +1,5 @@
+﻿var blog = {
+    init: function () {
+
+    }
+}
