@@ -1,0 +1,43 @@
+﻿@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@model Luval.Blog.Entities.BlogPost
+@{
+
+    ViewData["Title"] = "Compose Post";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<input name="Id" id="Id" type="hidden" value="@Html.Raw(Model.Id)" />
+<div class="row">
+    <div class="col">
+        <input name="Title" id="Title" type="text" class="form-control" placeholder="Enter title here">
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <a href="@Url.Action("Media", "Index")" target="_">Add Media</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <textarea id="MarkDownEditor">
+
+        </textarea>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/lib/luval.blog/blog.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            blog.init();
+            blog.initEditor();
+        });
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/lib/luval.blog/blog.css" asp-append-version="true">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+}

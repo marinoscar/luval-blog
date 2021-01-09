@@ -1,4 +1,5 @@
 ﻿using Luval.Blog.Entities;
+using Luval.Data;
 using Luval.Data.Extensions;
 using Luval.Data.Interfaces;
 using System;
@@ -11,6 +12,12 @@ namespace Luval.Blog
 {
     public class BlogRepository : IBlogRepository
     {
+
+        public BlogRepository(IUnitOfWorkFactory factory)
+        {
+            UnitOfWorkFactory = factory;
+        }
+
         protected IUnitOfWorkFactory UnitOfWorkFactory { get; private set; }
 
         public Task CreatePostAsync(BlogPost post, CancellationToken cancellationToken)
