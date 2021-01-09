@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\marin\code\Luval.Data\Luval.Data.csproj" />
     <ProjectReference Include="..\Luval.Blog\Luval.Blog.csproj" />
   </ItemGroup>
   
