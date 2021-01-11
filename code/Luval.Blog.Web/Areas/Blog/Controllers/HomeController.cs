@@ -32,6 +32,7 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
             if (post.UtcPublishDate == null || post.UtcPublishDate > DateTime.UtcNow.Date) return NotFound();
             var model = new PostViewModel()
             {
+                RowNum = 1,
                 Post = post,
                 PostDate = post.UtcPublishDate.Value.ToString("MMMM dd, yyyy"),
                 Author = "Oscar"
@@ -61,14 +62,9 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
         {
             if (post == null)
                 return BadRequest();
-            UserRepository.PrepareEntityForInsert(User, post);
-            await BlogRepository.CreatePostAsync(post, CancellationToken.None);
-            return Ok();
-        }
-
-        public IActionResult Post(string post)
-        {
-            return View();
+            UserRepository.PrepareEntityForUpdate(User, post);
+            var response = await BlogRepository.CreateOrUpdatePostAsync(post, CancellationToken.None);
+            return Json(response);
         }
     }
 }

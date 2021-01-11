@@ -7,9 +7,27 @@
 }
 
 <input name="Id" id="Id" type="hidden" value="@Html.Raw(Model.Id)" />
+<div class="form-row blog-margin">
+    <div class="col-9">
+        <input name="Title" id="Title" type="text" class="form-control" placeholder="Enter title here">
+    </div>
+    <div class="col">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="UtcPublishDate" name="UtcPublishDate" placeholder="Enter publish date" aria-label="Enter publish date" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row blog-margin">
     <div class="col">
-        <input name="Title" id="Title" type="text" class="form-control" placeholder="Enter title here">
+        <div id="alertbanner" class="alert alert-success alert-dismissible fade show" role="alert" style="display: none">
+            <span id="alertmessage">Succesfully saved</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     </div>
 </div>
 <div class="row">
@@ -22,17 +40,21 @@
 
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous"></script>
     <script src="~/lib/luval.blog/blog.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script>
         $(document).ready(function () {
             blog.init();
             blog.initEditor();
+            $('#UtcPublishDate').datepicker({
+            });
         });
     </script>
 }
 
 @section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" />
     <link rel="stylesheet" href="~/lib/luval.blog/blog.css" asp-append-version="true">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 }

@@ -9,6 +9,7 @@ namespace Luval.Blog.Web.Models
 {
     public class PostViewModel
     {
+        public int RowNum { get; set; }
         public BlogPost Post { get; set; }
         public bool IsEdit { get; set; }
         public string Author { get; set; }
