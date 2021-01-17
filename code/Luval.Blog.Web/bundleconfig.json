@@ -1,0 +1,15 @@
+[
+  {
+    "outputFileName": "resources/lib/luval.blog/blog.min.css",
+    "inputFiles": [ "resources/lib/luval.blog/**/!(*.min).css" ]
+  },
+  {
+    "outputFileName": "resources/lib/luval.blog/blog.min.js",
+    "inputFiles": [ "resources/lib/luval.blog/**/!(*.min).js" ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
+]
