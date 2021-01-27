@@ -22,13 +22,8 @@ namespace Luval.Blog.Entities
         public string Id { get; set; }
         public string Title { get; set; }
         public string Slug { get; set; }
-    }
-
-    [TableName("BlogPost")]
-    public class BlogPostContent
-    {
-        [PrimaryKey]
-        public string Id { get; set; }
-        public string Content { get; set; }
+        public DateTime? UtcPublishDate { get; set; }
+        public DateTime UtcCreatedOn { get; set; }
+        public string CreatedByUserId { get; set; }
     }
 }

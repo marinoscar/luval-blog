@@ -18,18 +18,21 @@
                 "quote", "unordered-list", "ordered-list", "table", "horizontal-rule", "|",
 				"link", "image", {
 					name: "addMedia",
-					action: function openMedia(editor) {
-						window.open('/Media', '_blank');
+                    action: function openMedia(editor) {
+                        blog.openMediaEditor();
 					},
 					className: "fa fa-folder-open",
 					title: "add media",
 				}, "code", "clean-block", "|", "preview", "side-by-side", "fullscreen", "guide"
 			],
         });
-        blog.setAlertMessage('Auto save is on, post will be saved every 5 minutes');
-        setTimeout(function () {
+        blog.setAlertMessage('Auto save is on, post will be saved every 2 minutes', 'info');
+        setInterval(function () {
             blog.savePost();
-        },((1000 * 60) * 5));
+        },((1000 * 60) * 2));
+    },
+    openMediaEditor: function () {
+        window.open('/Media', '_blank');
     },
     setAlertMessage: function (message, type) {
         var banner = $('#alertbanner');
@@ -71,7 +74,9 @@
 			Id: $('#Id').val(),
             Title: $('#Title').val(),
             Content: blog.editor.value(),
-            UtcPublishDate: $('#UtcPublishDate').val()
+            UtcPublishDate: $('#UtcPublishDate').val(),
+            UtcCreatedOn: $('#UtcCreatedOn').val(),
+            CreatedByUserId: $('#CreatedByUserId').val()
 		}
     },
     initShowdown: function () {
@@ -100,7 +105,7 @@
         converter.setFlavor('github');
         return converter.makeHtml(markdown);
     },
-    getPostContent: function () {
+    getPostHtmlContent: function () {
 
         var postAreas = $('[data-postarea]');
 
@@ -112,11 +117,61 @@
 
                 if (data == null || data == undefined)
                     return;
-                //var el = document.getElementById('BlogPostContent');
-                //el.innerHTML = blog.getHtml(data.content);
                 element.innerHTML = blog.getHtml(data.content);
 
             });
         });
+    },
+    getPostForEdit: function () {
+        var id = $('#Id').val();
+        $.getJSON("/Blog/PostContent/" + id, function (data) {
+
+            if (data == null || data == undefined)
+                return;
+            $('#Title').val(data.title);
+            $('#UtcPublishDate').val(data.publishDate);
+            $('#UtcCreatedOn').val(data.utcCreatedOn);
+            $('#CreatedByUserId').val(data.createdByUserId);
+            blog.editor.value(data.content);
+        });
+    },
+    updateProfilePic: function () {
+        var url = $('#ProfilePicture').val();
+        if (url === null || url === undefined || url === '') return;
+        $('#profilePicElement').attr('src', url);
+    },
+    updateAuthor: function () {
+        var author = blog.getAuthor();
+        $.ajax({
+            type: 'post',
+            url: '/Blog/Author/Update',
+            data: author,
+            success: function (data, status, jqXHR) {
+                if (jqXHR.status == "200") {
+                    if (data.isSuccess == true)
+                        blog.setAlertMessage('Author information updated succesfully', 'success');
+                    else
+                        blog.setAlertMessage('Failed to update the information, try again later', 'danger');
+                    return;
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == "200") 
+                    blog.setAlertMessage('Author information updated succesfully', 'success');
+                else
+                    blog.setAlertMessage('Failed to update the information, try again later', 'danger');
+            },
+            dataType: "json"
+        });
+    },
+    getAuthor: function () {
+        return {
+            Id: $('#Id').val(),
+            DisplayName: $('#DisplayName').val(),
+            UtcCreatedOn: $('#UtcCreatedOn').val(),
+            CreatedByUserId: $('#CreatedByUserId').val(),
+            ProfilePicture: $('#ProfilePicture').val(),
+            Website: $('#Website').val()
+        };
     }
 }

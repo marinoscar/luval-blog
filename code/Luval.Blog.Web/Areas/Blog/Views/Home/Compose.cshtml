@@ -1,12 +1,14 @@
 ﻿@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
-@model Luval.Blog.Entities.BlogPost
+@model Luval.Blog.Web.Models.PostViewModel
 @{
 
     ViewData["Title"] = "Compose Post";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<input name="Id" id="Id" type="hidden" value="@Html.Raw(Model.Id)" />
+<input name="Id" id="Id" type="hidden" value="@Html.Raw(Model.Post.Id)" />
+<input name="UtcCreatedOn" id="UtcCreatedOn" type="hidden" value="@Html.Raw(Model.Post.UtcCreatedOn)" />
+<input name="CreatedByUserId" id="CreatedByUserId" type="hidden" value="@Html.Raw(Model.Post.CreatedByUserId)" />
 <div class="form-row blog-margin">
     <div class="col-9">
         <input name="Title" id="Title" type="text" class="form-control" placeholder="Enter title here">
@@ -49,6 +51,10 @@
             blog.initEditor();
             $('#UtcPublishDate').datepicker({
             });
+            @if (Model.IsEdit)
+            {
+                @Html.Raw("blog.getPostForEdit();");
+            }
         });
     </script>
 }

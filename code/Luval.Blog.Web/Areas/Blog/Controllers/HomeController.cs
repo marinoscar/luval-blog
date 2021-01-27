@@ -44,8 +44,8 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
         public async Task<IActionResult> GetPostContent(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return NotFound();
-            var content = await BlogRepository.GetContentByIdAsync(id, CancellationToken.None);
-            return Json(new { Id = id, Content = content  });
+            var postInfo = await BlogRepository.FindByIdAsync(id, CancellationToken.None);
+            return Json(new PostContentViewModel(postInfo));
         }
 
         [HttpGet, Route("Blog/Compose")]
@@ -53,7 +53,15 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
         {
             var post = new BlogPost();
             UserRepository.PrepareEntityForInsert(User, post);
-            return View(post);
+            return View(new PostViewModel() { IsEdit = false, Post = post });
+        }
+
+        [HttpGet, Route("Blog/{id}/Edit")]
+        public async Task<IActionResult> EditPost(string id)
+        {
+            if (!(await BlogRepository.IsPostIdValid(id, CancellationToken.None)))
+                return NotFound();
+            return View("Compose", new PostViewModel() { IsEdit = true, Post = new BlogPost() { Id = id } });
         }
 
 

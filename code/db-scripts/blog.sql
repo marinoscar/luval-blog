@@ -98,8 +98,9 @@ CREATE TABLE BlogConfiguration(
 
 CREATE TABLE BlogAuthor(
 	Id varchar(100) NOT NULL,
-	ProfilePicture varchar(200) NOT NULL,
-	Website varchar(200) NOT NULL,
+	DisplayName varchar(200)  NULL,
+	ProfilePicture varchar(5000) NULL,
+	Website varchar(1000) NULL,
 	Bio nvarchar(2000) NOT NULL,
 	UtcCreatedOn datetime NOT NULL,
 	UtcUpdatedOn datetime NOT NULL,

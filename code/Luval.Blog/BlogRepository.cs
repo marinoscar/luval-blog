@@ -23,6 +23,30 @@ namespace Luval.Blog
 
         protected IUnitOfWorkFactory UnitOfWorkFactory { get; private set; }
 
+        public async Task<bool> IsPostIdValid(string postId, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(postId)) throw new ArgumentNullException(nameof(postId));
+            var postUoW = UnitOfWorkFactory.Create<BlogPostInfo, string>();
+            var res = await postUoW.Entities.GetAsync(i => i.Id == postId, cancellationToken);
+            return res != null && res.Any();
+        }
+
+        public async Task<BlogAuthor> GetAuthorByUserIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            var authorUoW = UnitOfWorkFactory.Create<BlogAuthor, string>();
+            return (await authorUoW.Entities.GetAsync(i => i.CreatedByUserId == userId, cancellationToken)).FirstOrDefault();
+        }
+
+        public async Task CreateOrUpdateAuthorAsync(BlogAuthor author, CancellationToken cancellationToken)
+        {
+            var authorUoW = UnitOfWorkFactory.Create<BlogAuthor, string>();
+            var dbAuthor = await authorUoW.Entities.GetAsync(author.Id, cancellationToken);
+            if (dbAuthor == null)
+                await authorUoW.AddAndSaveAsync(author, cancellationToken);
+            else
+                await authorUoW.UpdateAndSaveAsync(author, cancellationToken);
+        }
+
         public async Task<EntityResult<BlogPost>> CreateOrUpdatePostAsync(BlogPost post, CancellationToken cancellationToken)
         {
             var postUoW = UnitOfWorkFactory.Create<BlogPost, string>();
@@ -37,7 +61,11 @@ namespace Luval.Blog
                 await postUoW.AddAndSaveAsync(post, cancellationToken);
             }
             else
+            {
+                var res = await ValidatePostAsync(post, cancellationToken);
+                if (!res.IsSuccess) return res;
                 await postUoW.UpdateAndSaveAsync(post, cancellationToken);
+            }
 
             return new EntityResult<BlogPost>() { IsSuccess = true, Entity = post, Message = "Post saved successfully" };
         }
@@ -69,12 +97,12 @@ namespace Luval.Blog
             return await postUoW.Entities.GetAsync(posts.First().Id, cancellationToken);
         }
 
-        public async Task<string> GetContentByIdAsync(string id, CancellationToken cancellationToken)
+        public async Task<BlogPost> FindByIdAsync(string id, CancellationToken cancellationToken)
         {
-            var postUoW = UnitOfWorkFactory.Create<BlogPostContent, string>();
+            var postUoW = UnitOfWorkFactory.Create<BlogPost, string>();
             var result = await postUoW.Entities.GetAsync(id, cancellationToken);
             if (result == null) throw new ArgumentException("Invalid post id");
-            return result.Content;
+            return result;
         }
 
         private Task<IEnumerable<BlogPostInfo>> GetBlogPostInfoBySlugAsync(string slug, CancellationToken cancellationToken)

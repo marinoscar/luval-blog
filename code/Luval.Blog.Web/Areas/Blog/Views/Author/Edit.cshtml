@@ -1,0 +1,63 @@
+﻿@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@model Luval.Blog.Entities.BlogAuthor
+@{
+
+    ViewData["Title"] = "Author";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Author</h1>
+<input name="Id" id="Id" type="hidden" value="@Html.Raw(Model.Id)" />
+<input name="UtcCreatedOn" id="UtcCreatedOn" type="hidden" value="@Html.Raw(Model.UtcCreatedOn)" />
+<input name="CreatedByUserId" id="CreatedByUserId" type="hidden" value="@Html.Raw(Model.CreatedByUserId)" />
+<div class="row">
+    <div class="col">
+        <div id="alertbanner" class="alert alert-success alert-dismissible fade show" role="alert" style="display: none">
+            <span id="alertmessage">Succesfully saved</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-column align-items-center text-center">
+                    <img id="profilePicElement" src="@Html.Raw(Model.ProfilePicture)" alt="Admin" class="rounded-circle" width="150">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="form-group">
+            <label for="DisplayName">Display Name</label>
+            <input type="text" class="form-control" id="DisplayName" name="DisplayName" value="@Html.Raw(Model.DisplayName)" placeholder="Enter author's name">
+        </div>
+        <div class="form-group">
+            <label for="ProfilePicture">Profile Picture</label>
+            <div class="input-group mb-3">
+                <input type="url" class="form-control" id="ProfilePicture" name="ProfilePicture" value="@Html.Raw(Model.ProfilePicture)" placeholder="Profile picture URL">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="blog.openMediaEditor();"><i class="bi bi-cloud-arrow-up-fill"></i></button>
+                    <button class="btn btn-outline-secondary" type="button" onclick="blog.updateProfilePic();"><i class="bi bi-play-circle"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="ProfilePicture">Website</label>
+            <input type="url" class="form-control" id="Website" name="Website" value="@Html.Raw(Model.Website)" placeholder="Enter personal website">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="blog.updateAuthor();">Update</button>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+}
+@section Scripts {
+    <script src="~/lib/luval.blog/blog.js" asp-append-version="true"></script>
+}
