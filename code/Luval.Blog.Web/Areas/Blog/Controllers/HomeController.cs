@@ -26,16 +26,19 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
         [AllowAnonymous, HttpGet, Route("Blog/{id}")]
         public async Task<IActionResult> Index(string id)
         {
+            var cancellationToken = CancellationToken.None;
             if (string.IsNullOrWhiteSpace(id)) return NotFound();
-            var post = await BlogRepository.FindBySlugAsync(id, CancellationToken.None);
+            var post = await BlogRepository.FindBySlugAsync(id, cancellationToken);
             if (post == null) return NotFound();
             if (post.UtcPublishDate == null || post.UtcPublishDate > DateTime.UtcNow.Date) return NotFound();
+            var author = await BlogRepository.GetAuthorByUserIdAsync(post.CreatedByUserId, cancellationToken);
+            if (author == null) author = new BlogAuthor() { DisplayName = "Unknown" };
             var model = new PostViewModel()
             {
                 RowNum = 1,
                 Post = post,
                 PostDate = post.UtcPublishDate.Value.ToString("MMMM dd, yyyy"),
-                Author = "Oscar"
+                Author = author
             };
             return View(model);
         }
@@ -56,7 +59,7 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
             return View(new PostViewModel() { IsEdit = false, Post = post });
         }
 
-        [HttpGet, Route("Blog/{id}/Edit")]
+        [HttpGet, Route("Blog/Edit/{id}")]
         public async Task<IActionResult> EditPost(string id)
         {
             if (!(await BlogRepository.IsPostIdValid(id, CancellationToken.None)))

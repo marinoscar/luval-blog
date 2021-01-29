@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\marin\code\Luval.Data\Luval.Data.csproj" />
+    <PackageReference Include="Luval.Data" Version="1.1.1" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,7 @@ namespace Luval.Blog.Web.Models
         public int RowNum { get; set; }
         public BlogPost Post { get; set; }
         public bool IsEdit { get; set; }
-        public string Author { get; set; }
+        public BlogAuthor Author { get; set; }
         public string PostDate { get; set; }
     }
 }

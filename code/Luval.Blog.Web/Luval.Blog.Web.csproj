@@ -17,6 +17,7 @@
   <!-- Include for embedded resources -->
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
+    <PackageReference Include="Luval.Data" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.1" />
   </ItemGroup>
@@ -27,11 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\marin\code\Luval.Data\Luval.Data.csproj" />
     <ProjectReference Include="..\..\..\marin\code\Luval.Web.Security\Luval.Web.Security.csproj" />
     <ProjectReference Include="..\Luval.Blog\Luval.Blog.csproj" />
   </ItemGroup>
-  
-
 
 </Project>
