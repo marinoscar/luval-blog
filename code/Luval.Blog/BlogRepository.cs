@@ -34,7 +34,9 @@ namespace Luval.Blog
         public async Task<BlogAuthor> GetAuthorByUserIdAsync(string userId, CancellationToken cancellationToken)
         {
             var authorUoW = UnitOfWorkFactory.Create<BlogAuthor, string>();
-            return (await authorUoW.Entities.GetAsync(i => i.CreatedByUserId == userId, cancellationToken)).FirstOrDefault();
+            var res = (await authorUoW.Entities.GetAsync(i => i.CreatedByUserId == userId, cancellationToken)).FirstOrDefault();
+            if (res != null && string.IsNullOrWhiteSpace(res.ProfilePicture)) res.ProfilePicture = BlogAuthor.DefaultProfilePic;
+            return res;
         }
 
         public async Task CreateOrUpdateAuthorAsync(BlogAuthor author, CancellationToken cancellationToken)
@@ -103,6 +105,12 @@ namespace Luval.Blog
             var result = await postUoW.Entities.GetAsync(id, cancellationToken);
             if (result == null) throw new ArgumentException("Invalid post id");
             return result;
+        }
+
+        public async Task<IEnumerable<BlogPost>> GetPublishedPostsAsync(int take, DateTime startPublishedDate, CancellationToken cancellationToken)
+        {
+            var postUoW = UnitOfWorkFactory.Create<BlogPost, string>();
+            return await postUoW.Entities.GetAsync(i => i.UtcPublishDate >= startPublishedDate.Date, cancellationToken);
         }
 
         private Task<IEnumerable<BlogPostInfo>> GetBlogPostInfoBySlugAsync(string slug, CancellationToken cancellationToken)

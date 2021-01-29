@@ -1,7 +1,7 @@
 ﻿@model Luval.Blog.Web.Models.PostViewModel
 
 <div data-postarea>
-    <input type="hidden" id="PostId" value="@Html.Raw(Model.Post.Id)" />
+    <input type="hidden" value="@Html.Raw(Model.Post.Id)" />
     <div class="alert alert-secondary" role="alert">
         <h1 class="display-4">
             <a class="link-unstyled" href="/Blog/@Html.Raw(Model.Post.Slug)">@Html.DisplayFor(i => i.Post.Title)</a>
@@ -18,9 +18,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <div id="BlogPostContent" data-post>
-
-            </div>
+            <div data-post></div>
         </div>
     </div>
 </div>
