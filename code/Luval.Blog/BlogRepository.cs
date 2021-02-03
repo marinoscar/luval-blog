@@ -1,5 +1,6 @@
 ﻿using Luval.Blog.Entities;
 using Luval.Blog.Models;
+using Luval.Blog.ViewModel;
 using Luval.Data;
 using Luval.Data.Extensions;
 using Luval.Data.Interfaces;
@@ -10,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace Luval.Blog
 {
@@ -27,14 +29,14 @@ namespace Luval.Blog
         {
             if (string.IsNullOrWhiteSpace(postId)) throw new ArgumentNullException(nameof(postId));
             var postUoW = UnitOfWorkFactory.Create<BlogPostInfo, string>();
-            var res = await postUoW.Entities.GetAsync(i => i.Id == postId, cancellationToken);
+            var res = await postUoW.Entities.Query.GetAsync(i => i.Id == postId, cancellationToken);
             return res != null && res.Any();
         }
 
         public async Task<BlogAuthor> GetAuthorByUserIdAsync(string userId, CancellationToken cancellationToken)
         {
             var authorUoW = UnitOfWorkFactory.Create<BlogAuthor, string>();
-            var res = (await authorUoW.Entities.GetAsync(i => i.CreatedByUserId == userId, cancellationToken)).FirstOrDefault();
+            var res = (await authorUoW.Entities.Query.GetAsync(i => i.CreatedByUserId == userId, cancellationToken)).FirstOrDefault();
             if (res != null && string.IsNullOrWhiteSpace(res.ProfilePicture)) res.ProfilePicture = BlogAuthor.DefaultProfilePic;
             return res;
         }
@@ -42,7 +44,7 @@ namespace Luval.Blog
         public async Task CreateOrUpdateAuthorAsync(BlogAuthor author, CancellationToken cancellationToken)
         {
             var authorUoW = UnitOfWorkFactory.Create<BlogAuthor, string>();
-            var dbAuthor = await authorUoW.Entities.GetAsync(author.Id, cancellationToken);
+            var dbAuthor = await authorUoW.Entities.Query.GetAsync(author.Id, cancellationToken);
             if (dbAuthor == null)
                 await authorUoW.AddAndSaveAsync(author, cancellationToken);
             else
@@ -52,7 +54,7 @@ namespace Luval.Blog
         public async Task<EntityResult<BlogPost>> CreateOrUpdatePostAsync(BlogPost post, CancellationToken cancellationToken)
         {
             var postUoW = UnitOfWorkFactory.Create<BlogPost, string>();
-            var posts = await postUoW.Entities.GetRawAsync("SELECT Id FROM BlogPost Where Id = {0}".FormatSql(post.Id).ToCmd(),
+            var posts = await postUoW.Entities.Query.GetRawAsync("SELECT Id FROM BlogPost Where Id = {0}".FormatSql(post.Id).ToCmd(),
                                                          cancellationToken);
             if (posts != null && !posts.Any())
             {
@@ -94,29 +96,45 @@ namespace Luval.Blog
         {
             var postInfo = UnitOfWorkFactory.Create<BlogPostInfo, string>();
             var postUoW = UnitOfWorkFactory.Create<BlogPost, string>();
-            var posts = await postInfo.Entities.GetAsync(i => i.Slug == slug, cancellationToken);
+            var posts = await postInfo.Entities.Query.GetAsync(i => i.Slug == slug, cancellationToken);
             if (posts == null || !posts.Any()) return default(BlogPost);
-            return await postUoW.Entities.GetAsync(posts.First().Id, cancellationToken);
+            return await postUoW.Entities.Query.GetAsync(posts.First().Id, cancellationToken);
         }
 
         public async Task<BlogPost> FindByIdAsync(string id, CancellationToken cancellationToken)
         {
             var postUoW = UnitOfWorkFactory.Create<BlogPost, string>();
-            var result = await postUoW.Entities.GetAsync(id, cancellationToken);
+            var result = await postUoW.Entities.Query.GetAsync(id, cancellationToken);
             if (result == null) throw new ArgumentException("Invalid post id");
             return result;
         }
 
-        public async Task<IEnumerable<BlogPost>> GetPublishedPostsAsync(int take, DateTime startPublishedDate, CancellationToken cancellationToken)
+        public async Task<IEnumerable<BlogPostViewModel>> GetPublishedPostsAsync(int take, DateTime startPublishedDate, CancellationToken cancellationToken)
         {
-            var postUoW = UnitOfWorkFactory.Create<BlogPost, string>();
-            return await postUoW.Entities.GetAsync(i => i.UtcPublishDate >= startPublishedDate.Date, cancellationToken);
+            var postUoW = UnitOfWorkFactory.Create<BlogPostViewModel, string>();
+            var posts = await postUoW.Entities.Query.GetAsync(GetBlogPostViewModelQuery(take, startPublishedDate.Date).ToCmd(), cancellationToken);
+            return posts;
+        }
+
+        private static string GetBlogPostViewModelQuery(int take, DateTime dateTime)
+        {
+            var q = @"
+SELECT TOP({0})
+	[BP].[Id], [BP].[Title], [BP].[Slug], [BP].[Tags], [BP].[UtcPublishDate], [BP].[UtcCreatedOn], [BP].[UtcUpdatedOn], [BP].[CreatedByUserId], [BP].[UpdatedByUserId],
+	[BA].[DisplayName], [BA].[ProfilePicture], [BA].[Id] As [AuthorId]
+FROM 
+	[BlogPost] As [BP]
+	LEFT JOIN [BlogAuthor] As [BA] ON [BP].[CreatedByUserId] = [BA].[CreatedByUserId]
+WHERE [BP].[UtcPublishDate] <= {1}
+ORDER BY [BP].[UtcPublishDate] DESC
+                     ".FormatSql(take, dateTime);
+            return q;
         }
 
         private Task<IEnumerable<BlogPostInfo>> GetBlogPostInfoBySlugAsync(string slug, CancellationToken cancellationToken)
         {
             var uow = UnitOfWorkFactory.Create<BlogPostInfo, string>();
-            return uow.Entities.GetAsync(i => i.Slug == slug, cancellationToken);
+            return uow.Entities.Query.GetAsync(i => i.Slug == slug, cancellationToken);
         }
 
         private void UpdateCreateSlug(BlogPost post)

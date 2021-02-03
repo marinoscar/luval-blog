@@ -1,5 +1,8 @@
 ﻿using Luval.Blog.Entities;
 using Luval.Blog.Models;
+using Luval.Blog.ViewModel;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,5 +16,6 @@ namespace Luval.Blog
         Task<BlogPost> FindBySlugAsync(string slug, CancellationToken cancellationToken);
         Task<BlogPost> FindByIdAsync(string id, CancellationToken cancellationToken);
         Task<bool> IsPostIdValid(string postId, CancellationToken cancellationToken);
+        Task<IEnumerable<BlogPostViewModel>> GetPublishedPostsAsync(int take, DateTime startPublishedDate, CancellationToken cancellationToken);
     }
 }

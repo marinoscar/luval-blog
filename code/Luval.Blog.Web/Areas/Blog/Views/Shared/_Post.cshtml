@@ -1,24 +1,36 @@
 ﻿@model Luval.Blog.Web.Models.PostViewModel
 
-<div data-postarea>
+<div data-postarea data-ispreview="@Model.IsPreview.ToString().ToLowerInvariant()">
     <input type="hidden" value="@Html.Raw(Model.Post.Id)" />
-    <div class="alert alert-secondary" role="alert">
-        <h1 class="display-4">
-            <a class="link-unstyled" href="/Blog/@Html.Raw(Model.Post.Slug)">@Html.DisplayFor(i => i.Post.Title)</a>
-        </h1>
-        <div class="row px-3">
-            <img class="rounded-circle post-profile-pic" src="@Html.Raw(Model.Author.ProfilePicture)">
-            <div class="flex-column">
-                <h5 class="mb-0 font-weight-normal">@Html.DisplayFor(i => i.Author.DisplayName)</h5>
-                <p class="small">@Html.DisplayFor(i => i.PostDate)</p>
-            </div>
-        </div>
-        <hr>
-        <p class="mb-0"></p>
-    </div>
     <div class="row">
         <div class="col">
-            <div data-post></div>
+            <h1 class="display-4">
+                <a class="link-unstyled" href="/Blog/@Html.Raw(Model.Post.Slug)">@Html.DisplayFor(i => i.Post.Title)</a>
+            </h1>
         </div>
     </div>
+    <div class="d-flex">
+        <div class="p-2">
+            <img class="rounded-circle post-profile-pic" src="@Html.Raw(Model.Post.ProfilePicture)">
+        </div>
+        <div class="p-2">
+            <h5 class="mb-0 font-weight-normal">@Html.DisplayFor(i => i.Post.DisplayName)</h5>
+            <p class="small">@Html.DisplayFor(i => i.PostDate)</p>
+        </div>
+        <div class="ml-auto p-2">
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href = '/Blog/Edit/@Html.Raw(Model.Post.Id)'">Edit</button>
+            @if (User.Identity.IsAuthenticated)
+            {
+
+            }
+        </div>
+    </div>
+    <hr>
+    <div data-post></div>
 </div>
+@if (Model.IsPreview)
+{
+    <div class="d-flex flex-row-reverse">
+        <div class="p-2"><button type="button" class="btn btn-secondary btn-sm" onclick="window.location.href = '/Blog/@Html.Raw(Model.Post.Slug)'">Read More</button></div>
+    </div>
+}

@@ -1,4 +1,5 @@
 ﻿using Luval.Blog.Entities;
+using Luval.Blog.ViewModel;
 using Luval.Blog.Web.Models;
 using Luval.Web.Security;
 using Microsoft.AspNetCore.Authorization;
@@ -35,12 +36,31 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
             if (author == null) author = new BlogAuthor() { DisplayName = "Unknown" };
             var model = new PostViewModel()
             {
-                RowNum = 1,
-                Post = post,
+                Post = BlogPostViewModel.From(post),
                 PostDate = post.UtcPublishDate.Value.ToString("MMMM dd, yyyy"),
                 Author = author
             };
-            return View(model);
+            return View(new[] { model });
+        }
+
+        [AllowAnonymous, HttpGet, Route("Blog")]
+        public async Task<IActionResult> Index()
+        {
+            var cancellationToken = CancellationToken.None;
+            var posts = (await BlogRepository.GetPublishedPostsAsync(100, DateTime.Today, cancellationToken))
+                .OrderByDescending(i => i.UtcPublishDate)
+                .ToList();
+            var result = new List<PostViewModel>();
+            foreach (var post in posts)
+            {
+                result.Add(new PostViewModel()
+                {
+                    Post = post,
+                    IsPreview = true,
+                    PostDate = post.UtcPublishDate.Value.Date.ToString("MMMM dd, yyyy")
+                });
+            }
+            return View(result);
         }
 
         [AllowAnonymous, HttpGet, Route("Blog/PostContent/{id}")]
@@ -56,7 +76,7 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
         {
             var post = new BlogPost();
             UserRepository.PrepareEntityForInsert(User, post);
-            return View(new PostViewModel() { IsEdit = false, Post = post });
+            return View(new PostViewModel() { IsEdit = false, Post = BlogPostViewModel.From(post) });
         }
 
         [HttpGet, Route("Blog/Edit/{id}")]
@@ -64,7 +84,7 @@ namespace Luval.Blog.Web.Areas.Blog.Controllers
         {
             if (!(await BlogRepository.IsPostIdValid(id, CancellationToken.None)))
                 return NotFound();
-            return View("Compose", new PostViewModel() { IsEdit = true, Post = new BlogPost() { Id = id } });
+            return View("Compose", new PostViewModel() { IsEdit = true, Post = new BlogPostViewModel() { Id = id } });
         }
 
 

@@ -1,25 +1,32 @@
 ﻿@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
-@model Luval.Blog.Web.Models.PostViewModel
+@model IEnumerable<Luval.Blog.Web.Models.PostViewModel>
 @{
 
     ViewData["Title"] = "Blog";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Html.Partial("_Post", Model)
+@foreach (var post in Model)
+{
+    <div class="row">
+        <div class="col">
+            @Html.Partial("_Post", post)
+        </div>
+    </div>
+}
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous"></script>
-    <script src="~/lib/luval.blog/blog.js?v4"></script>
+    <script src="~/lib/luval.blog/blog.js?v12"></script>
     <script>
         $(document).ready(function () {
             blog.initShowdown();
-            blog.getPostHtmlContent();
+            blog.initPostHtml();
         });
     </script>
 }
 
 @section Styles {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
-    <link rel="stylesheet" href="~/lib/luval.blog/blog.css?v4">
+    <link rel="stylesheet" href="~/lib/luval.blog/blog.css?v7">
 }

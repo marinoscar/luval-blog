@@ -105,21 +105,41 @@
         converter.setFlavor('github');
         return converter.makeHtml(markdown);
     },
-    getPostHtmlContent: function () {
+    initPostHtml: function () {
 
-        var postAreas = $('[data-postarea]');
+        blog.postObserver = new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting === true) {
+                //if element is visible
+                blog.getPostHtml(entries[0].target);
+            }
+        }, { threshold: [0] });
+        $("[data-postarea]").each(function (i, el) {
+            blog.postObserver.observe(el);
+            if (i < 5) 
+                blog.getPostHtml(el);
+        });
+    },
+    getPostHtml: function (parent) {
+        var els = $(parent).find('[data-post]');
+        if (els === null || els == undefined)
+            return;
+        var element = els[0];
 
-        postAreas.each(function (index, post) {
+        //if the element has data already exit
+        if (!(element.innerHTML == null || element.innerHTML == undefined || element.innerHTML == ''))
+            return;
+        var id = $(parent).find('input[type=hidden]').val();
+        $.getJSON("/Blog/PostContent/" + id, function (data) {
 
-            var id = $(post).find('input[type=hidden]').val();
-            var element = $(post).find('[data-post]')[0];
-            $.getJSON("/Blog/PostContent/" + id, function (data) {
+            if (data == null || data == undefined)
+                return;
 
-                if (data == null || data == undefined)
-                    return;
-                element.innerHTML = blog.getHtml(data.content);
-
-            });
+            //element.innerHTML = blog.getHtml(data.content);
+            $(element).append(blog.getHtml(data.content))
+                
+            if ($(element).parent().data('ispreview') && $(element).parent().height() > 768) {
+                $(element).parent().height(768).css('overflow', 'hidden');
+            }
         });
     },
     getPostForEdit: function () {

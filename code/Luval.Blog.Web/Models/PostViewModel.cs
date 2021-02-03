@@ -1,4 +1,5 @@
 ﻿using Luval.Blog.Entities;
+using Luval.Blog.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace Luval.Blog.Web.Models
 {
     public class PostViewModel
     {
-        public int RowNum { get; set; }
-        public BlogPost Post { get; set; }
+        public BlogPostViewModel Post { get; set; }
         public bool IsEdit { get; set; }
+        public bool IsPreview { get; set; }
         public BlogAuthor Author { get; set; }
         public string PostDate { get; set; }
     }
